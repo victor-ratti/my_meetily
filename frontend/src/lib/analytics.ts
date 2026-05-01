@@ -490,7 +490,7 @@ export class Analytics {
   }
 
   // Copy tracking with frequency
-  static async trackCopy(copyType: 'transcript' | 'summary', properties?: Record<string, any>): Promise<void> {
+  static async trackCopy(copyType: 'transcript', properties?: Record<string, any>): Promise<void> {
     if (!this.initialized) return;
 
     try {
@@ -710,127 +710,6 @@ export class Analytics {
     }
   }
 
-  // Summary generation analytics
-  static async trackSummaryGenerationStarted(
-    modelProvider: string,
-    modelName: string,
-    transcriptLength: number,
-    timeSinceRecordingMinutes?: number
-  ) {
-    if (!this.initialized) {
-      console.warn('Analytics not initialized, skipping summary generation started tracking');
-      return;
-    }
-
-    try {
-      const deviceInfo = await this.getDeviceInfo();
-      console.log('Tracking summary generation started event:', {
-        modelProvider,
-        modelName,
-        transcriptLength,
-        timeSinceRecordingMinutes
-      });
-
-      const properties: AnalyticsProperties = {
-        model_provider: modelProvider,
-        model_name: modelName,
-        transcript_length: transcriptLength.toString(),
-        platform: deviceInfo.platform,
-        os_version: deviceInfo.os_version
-      };
-
-      if (timeSinceRecordingMinutes !== undefined) {
-        properties.time_since_recording_minutes = timeSinceRecordingMinutes.toFixed(2);
-      }
-
-      await this.track('summary_generation_started', properties);
-      console.log('Summary generation started event tracked successfully');
-    } catch (error) {
-      console.error('Failed to track summary generation started:', error);
-    }
-  }
-
-  static async trackSummaryGenerationCompleted(
-    modelProvider: string, 
-    modelName: string, 
-    success: boolean, 
-    durationSeconds?: number, 
-    errorMessage?: string
-  ) {
-    if (!this.initialized) {
-      console.warn('Analytics not initialized, skipping summary generation completed tracking');
-      return;
-    }
-
-    try {
-      console.log('Tracking summary generation completed event:', { modelProvider, modelName, success, durationSeconds, errorMessage });
-      await invoke('track_summary_generation_completed', {
-        modelProvider,
-        modelName,
-        success,
-        durationSeconds,
-        errorMessage
-      });
-      console.log('Summary generation completed event tracked successfully');
-    } catch (error) {
-      console.error('Failed to track summary generation completed:', error);
-    }
-  }
-
-  static async trackSummaryRegenerated(modelProvider: string, modelName: string) {
-    if (!this.initialized) {
-      console.warn('Analytics not initialized, skipping summary regenerated tracking');
-      return;
-    }
-
-    try {
-      console.log('Tracking summary regenerated event:', { modelProvider, modelName });
-      await invoke('track_summary_regenerated', {
-        modelProvider,
-        modelName
-      });
-      console.log('Summary regenerated event tracked successfully');
-    } catch (error) {
-      console.error('Failed to track summary regenerated:', error);
-    }
-  }
-
-  static async trackModelChanged(oldProvider: string, oldModel: string, newProvider: string, newModel: string) {
-    if (!this.initialized) {
-      console.warn('Analytics not initialized, skipping model changed tracking');
-      return;
-    }
-
-    try {
-      console.log('Tracking model changed event:', { oldProvider, oldModel, newProvider, newModel });
-      await invoke('track_model_changed', {
-        oldProvider,
-        oldModel,
-        newProvider,
-        newModel
-      });
-      console.log('Model changed event tracked successfully');
-    } catch (error) {
-      console.error('Failed to track model changed:', error);
-    }
-  }
-
-  static async trackCustomPromptUsed(promptLength: number) {
-    if (!this.initialized) {
-      console.warn('Analytics not initialized, skipping custom prompt used tracking');
-      return;
-    }
-
-    try {
-      console.log('Tracking custom prompt used event:', { promptLength });
-      await invoke('track_custom_prompt_used', {
-        promptLength
-      });
-      console.log('Custom prompt used event tracked successfully');
-    } catch (error) {
-      console.error('Failed to track custom prompt used:', error);
-    }
-  }
 }
 
-export default Analytics; 
+export default Analytics;

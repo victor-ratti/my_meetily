@@ -63,7 +63,7 @@ export function About() {
                 {/* <h1 className="text-xl font-bold text-gray-900">Meetily</h1> */}
                 <span className="text-sm text-gray-500"> v{currentVersion}</span>
                 <p className="text-medium text-gray-600 mt-1">
-                    Real-time notes and summaries that never leave your machine.
+                    Real-time transcripts that never leave your machine.
                 </p>
                 <div className="mt-3">
                     <Button
@@ -99,11 +99,11 @@ export function About() {
                 <div className="grid grid-cols-2 gap-2">
                     <div className="bg-gray-50 rounded p-3 hover:bg-gray-100 transition-colors">
                         <h3 className="font-bold text-sm text-gray-900 mb-1">Privacy-first</h3>
-                        <p className="text-xs text-gray-600 leading-relaxed">Your data & AI processing workflow can now stay within your premise. No cloud, no leaks.</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">Your transcript workflow can stay on your machine. No cloud, no leaks.</p>
                     </div>
                     <div className="bg-gray-50 rounded p-3 hover:bg-gray-100 transition-colors">
-                        <h3 className="font-bold text-sm text-gray-900 mb-1">Use Any Model</h3>
-                        <p className="text-xs text-gray-600 leading-relaxed">Prefer local open-source model? Great. Want to plug in an external API? Also fine. No lock-in.</p>
+                        <h3 className="font-bold text-sm text-gray-900 mb-1">Transcript-first</h3>
+                        <p className="text-xs text-gray-600 leading-relaxed">Focus on captured meeting text without generated notes or extra output.</p>
                     </div>
                     <div className="bg-gray-50 rounded p-3 hover:bg-gray-100 transition-colors">
                         <h3 className="font-bold text-sm text-gray-900 mb-1">Cost-Smart</h3>
@@ -119,7 +119,7 @@ export function About() {
             {/* Coming Soon - Compact */}
             <div className="bg-blue-50 rounded p-3">
                 <p className="text-s text-blue-800">
-                    <span className="font-bold">Coming soon:</span> A library of on-device AI agents-automating follow-ups, action tracking, and more.
+                    <span className="font-bold">Coming soon:</span> More tools for reviewing, searching, and exporting local transcripts.
                 </p>
             </div>
 
@@ -127,7 +127,7 @@ export function About() {
             <div className="text-center space-y-2">
                 <h3 className="text-medium font-semibold text-gray-800">Ready to push your business further?</h3>
                 <p className="text-s text-gray-600">
-                    If you're planning to build privacy-first custom AI agents or a fully tailored product for your <span className="font-bold">business</span>, we can help you build it.
+                    If you're planning to build privacy-first transcript workflows or a fully tailored product for your <span className="font-bold">business</span>, we can help you build it.
                 </p>
                 <button
                     onClick={handleContactClick}

@@ -9,14 +9,11 @@ import { storageService } from '@/services/storageService';
 import { transcriptService } from '@/services/transcriptService';
 import Analytics from '@/lib/analytics';
 
-type SummaryStatus = 'idle' | 'processing' | 'summarizing' | 'regenerating' | 'completed' | 'error';
-
 interface UseRecordingStopReturn {
   handleRecordingStop: (callApi: boolean) => Promise<void>;
   isStopping: boolean;
   isProcessingTranscript: boolean;
   isSavingTranscript: boolean;
-  summaryStatus: SummaryStatus;
   setIsStopping: (value: boolean) => void;
 }
 
@@ -307,9 +304,9 @@ export function useRecordingStop(
             duration: 10000,
           });
 
-          // Auto-navigate after a short delay with source parameter
+          // Auto-navigate after a short delay.
           setTimeout(() => {
-            router.push(`/meeting-details?id=${meetingId}&source=recording`);
+            router.push(`/meeting-details?id=${meetingId}`);
             clearTranscripts()
             Analytics.trackPageView('meeting_details');
 
@@ -426,15 +423,11 @@ export function useRecordingStop(
     };
   }, []);
 
-  // Derive summaryStatus from RecordingStatus for backward compatibility
-  const summaryStatus: SummaryStatus = status === RecordingStatus.PROCESSING_TRANSCRIPTS ? 'processing' : 'idle';
-
   return {
     handleRecordingStop,
     isStopping,
     isProcessingTranscript,
     isSavingTranscript,
-    summaryStatus,
     setIsStopping: (value: boolean) => {
       setStatus(value ? RecordingStatus.STOPPING : RecordingStatus.IDLE);
     },

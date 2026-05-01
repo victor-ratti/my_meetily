@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Sparkles, Cpu } from 'lucide-react';
+import { Lock, FileText, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OnboardingContainer } from '../OnboardingContainer';
 import { useOnboarding } from '@/contexts/OnboardingContext';
@@ -13,8 +13,8 @@ export function WelcomeStep() {
       title: 'Your data never leaves your device',
     },
     {
-      icon: Sparkles,
-      title: 'Intelligent summaries & insights',
+      icon: FileText,
+      title: 'Local meeting transcripts',
     },
     {
       icon: Cpu,
@@ -25,15 +25,13 @@ export function WelcomeStep() {
   return (
     <OnboardingContainer
       title="Welcome to Meetily"
-      description="Record. Transcribe. Summarize. All on your device."
+      description="Record. Transcribe. Keep everything on your device."
       step={1}
       hideProgress={true}
     >
       <div className="flex flex-col items-center space-y-10">
-        {/* Divider */}
         <div className="w-16 h-px bg-gray-300" />
 
-        {/* Features Card */}
         <div className="w-full max-w-md bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
           {features.map((feature, index) => {
             const Icon = feature.icon;
@@ -50,7 +48,6 @@ export function WelcomeStep() {
           })}
         </div>
 
-        {/* CTA Section */}
         <div className="w-full max-w-xs space-y-3">
           <Button
             onClick={goNext}

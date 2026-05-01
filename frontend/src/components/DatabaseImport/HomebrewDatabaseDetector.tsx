@@ -112,7 +112,7 @@ export function HomebrewDatabaseDetector({ onImportSuccess, onDecline }: Homebre
             </p>
           </div>
           <p className="text-sm text-blue-800 mb-3">
-            Would you like to import your previous meetings, transcripts, and summaries?
+            Would you like to import your previous meetings and transcripts?
           </p>
           
           {/* Yes/No Buttons */}
@@ -148,4 +148,3 @@ export function HomebrewDatabaseDetector({ onImportSuccess, onDecline }: Homebre
     </div>
   );
 }
-

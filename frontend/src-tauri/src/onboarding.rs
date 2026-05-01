@@ -20,7 +20,7 @@ pub struct OnboardingStatus {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct ModelStatus {
     pub parakeet: String,  // "downloaded" | "not_downloaded" | "downloading"
-    pub summary: String,   // Generic field for summary model (gemma3:1b or gemma3:4b)
+    pub summary: String,   // Legacy field retained for stored status compatibility.
 }
 
 impl Default for OnboardingStatus {
@@ -31,7 +31,7 @@ impl Default for OnboardingStatus {
             current_step: 1,
             model_status: ModelStatus {
                 parakeet: "not_downloaded".to_string(),
-                summary: "not_downloaded".to_string(),  // Changed from gemma
+                summary: "disabled".to_string(),
             },
             last_updated: chrono::Utc::now().to_rfc3339(),
         }
@@ -168,25 +168,11 @@ pub async fn reset_onboarding_status_cmd<R: Runtime>(
 pub async fn complete_onboarding<R: Runtime>(
     app: AppHandle<R>,
     state: tauri::State<'_, AppState>,
-    model: String,
 ) -> Result<(), String> {
-    info!("Completing onboarding with builtin-ai model: {}", model);
+    info!("Completing onboarding for transcript-only setup");
 
-    // Step 1: Save model configuration to SQLite database FIRST
+    // Step 1: Save transcription configuration to SQLite database FIRST
     let pool = state.db_manager.pool();
-
-    // Onboarding always uses builtin-ai (local LLM)
-    if let Err(e) = SettingsRepository::save_model_config(
-        pool,
-        "builtin-ai",
-        &model,
-        "large-v3",
-        None,
-    ).await {
-        error!("Failed to save builtin-ai model config: {}", e);
-        return Err(format!("Failed to save builtin-ai model config: {}", e));
-    }
-    info!("Saved builtin-ai model config: model={}", model);
 
     // Save transcription model config (parakeet provider) - always parakeet
     if let Err(e) = SettingsRepository::save_transcript_config(
@@ -207,12 +193,12 @@ pub async fn complete_onboarding<R: Runtime>(
     status.completed = true;
     status.current_step = 4; // Max step (4 on macOS with permissions, 3 on other platforms)
     status.model_status.parakeet = "downloaded".to_string();
-    status.model_status.summary = "downloaded".to_string();
+    status.model_status.summary = "disabled".to_string();
 
     save_onboarding_status(&app, &status)
         .await
         .map_err(|e| format!("Failed to save completed onboarding status: {}", e))?;
 
-    info!("Onboarding completed successfully with model: {}", model);
+    info!("Onboarding completed successfully");
     Ok(())
 }

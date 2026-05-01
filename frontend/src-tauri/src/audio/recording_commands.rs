@@ -748,21 +748,6 @@ pub async fn stop_recording<R: Runtime>(
         let (transcription_provider, transcription_model) = transcription_config
             .unwrap_or_else(|| ("unknown".to_string(), "unknown".to_string()));
 
-        // Get summary model info from API
-        let summary_config = match crate::api::api::api_get_model_config(
-            app.clone(),
-            app.clone().state(),
-            None,
-        )
-        .await
-        {
-            Ok(Some(config)) => Some((config.provider, config.model)),
-            _ => None,
-        };
-
-        let (summary_provider, summary_model) = summary_config
-            .unwrap_or_else(|| ("unknown".to_string(), "unknown".to_string()));
-
         // Classify device types (privacy-safe)
         let microphone_device_type = mic_device_name
             .as_ref()
@@ -778,8 +763,6 @@ pub async fn stop_recording<R: Runtime>(
         match crate::analytics::commands::track_meeting_ended(
             transcription_provider.clone(),
             transcription_model.clone(),
-            summary_provider.clone(),
-            summary_model.clone(),
             total_duration,
             active_duration,
             pause_duration,

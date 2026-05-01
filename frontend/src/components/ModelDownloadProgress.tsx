@@ -98,13 +98,13 @@ export function ProgressRing({ progress, size = 40, strokeWidth = 3 }: ProgressR
   );
 }
 
-interface DownloadSummaryProps {
+interface DownloadOverviewProps {
   totalModels: number;
   downloadedModels: number;
   totalSizeMb: number;
 }
 
-export function DownloadSummary({ totalModels, downloadedModels, totalSizeMb }: DownloadSummaryProps) {
+export function DownloadOverview({ totalModels, downloadedModels, totalSizeMb }: DownloadOverviewProps) {
   const formatSize = (mb: number) => {
     if (mb >= 1000) return `${(mb / 1000).toFixed(1)}GB`;
     return `${mb}MB`;

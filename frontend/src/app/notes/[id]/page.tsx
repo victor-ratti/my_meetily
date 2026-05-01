@@ -36,8 +36,8 @@ const NotePage = ({ params }: PageProps) => {
       attendees: ['John Doe', 'Jane Smith', 'Mike Johnson'],
       tags: ['Team Sync', 'Weekly', 'Product'],
       content: `
-# Meeting Summary
-Team sync discussion about Q1 2024 goals and current project status.
+# Meeting Transcript Notes
+Team sync transcript notes about Q1 2024 goals and current project status.
 
 ## Agenda Items
 1. Project Status Updates
@@ -91,7 +91,7 @@ Quarterly product review session with stakeholders.
 # Project Ideas
 
 ## New Features
-1. AI-powered meeting summaries
+1. Searchable meeting transcripts
 2. Calendar integration
 3. Team collaboration tools
 

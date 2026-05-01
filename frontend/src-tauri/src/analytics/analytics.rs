@@ -269,69 +269,10 @@ impl AnalyticsClient {
         self.track_event("feature_used", Some(properties)).await
     }
 
-    // Summary generation analytics
-    pub async fn track_summary_generation_started(&self, model_provider: &str, model_name: &str, transcript_length: usize) -> Result<(), String> {
-        let mut properties = HashMap::new();
-        properties.insert("model_provider".to_string(), model_provider.to_string());
-        properties.insert("model_name".to_string(), model_name.to_string());
-        properties.insert("transcript_length".to_string(), transcript_length.to_string());
-        properties.insert("timestamp".to_string(), chrono::Utc::now().to_rfc3339());
-        
-        self.track_event("summary_generation_started", Some(properties)).await
-    }
-
-    pub async fn track_summary_generation_completed(&self, model_provider: &str, model_name: &str, success: bool, duration_seconds: Option<u64>, error_message: Option<&str>) -> Result<(), String> {
-        let mut properties = HashMap::new();
-        properties.insert("model_provider".to_string(), model_provider.to_string());
-        properties.insert("model_name".to_string(), model_name.to_string());
-        properties.insert("success".to_string(), success.to_string());
-        properties.insert("timestamp".to_string(), chrono::Utc::now().to_rfc3339());
-        
-        if let Some(duration) = duration_seconds {
-            properties.insert("duration_seconds".to_string(), duration.to_string());
-        }
-        
-        if let Some(error) = error_message {
-            properties.insert("error_message".to_string(), error.to_string());
-        }
-        
-        self.track_event("summary_generation_completed", Some(properties)).await
-    }
-
-    pub async fn track_summary_regenerated(&self, model_provider: &str, model_name: &str) -> Result<(), String> {
-        let mut properties = HashMap::new();
-        properties.insert("model_provider".to_string(), model_provider.to_string());
-        properties.insert("model_name".to_string(), model_name.to_string());
-        properties.insert("timestamp".to_string(), chrono::Utc::now().to_rfc3339());
-        
-        self.track_event("summary_regenerated", Some(properties)).await
-    }
-
-    pub async fn track_model_changed(&self, old_provider: &str, old_model: &str, new_provider: &str, new_model: &str) -> Result<(), String> {
-        let mut properties = HashMap::new();
-        properties.insert("old_provider".to_string(), old_provider.to_string());
-        properties.insert("old_model".to_string(), old_model.to_string());
-        properties.insert("new_provider".to_string(), new_provider.to_string());
-        properties.insert("new_model".to_string(), new_model.to_string());
-        properties.insert("timestamp".to_string(), chrono::Utc::now().to_rfc3339());
-        
-        self.track_event("model_changed", Some(properties)).await
-    }
-
-    pub async fn track_custom_prompt_used(&self, prompt_length: usize) -> Result<(), String> {
-        let mut properties = HashMap::new();
-        properties.insert("prompt_length".to_string(), prompt_length.to_string());
-        properties.insert("timestamp".to_string(), chrono::Utc::now().to_rfc3339());
-
-        self.track_event("custom_prompt_used", Some(properties)).await
-    }
-
     pub async fn track_meeting_ended(
         &self,
         transcription_provider: &str,
         transcription_model: &str,
-        summary_provider: &str,
-        summary_model: &str,
         total_duration_seconds: Option<f64>,
         active_duration_seconds: f64,
         pause_duration_seconds: f64,
@@ -346,8 +287,6 @@ impl AnalyticsClient {
         // Model information
         properties.insert("transcription_provider".to_string(), transcription_provider.to_string());
         properties.insert("transcription_model".to_string(), transcription_model.to_string());
-        properties.insert("summary_provider".to_string(), summary_provider.to_string());
-        properties.insert("summary_model".to_string(), summary_model.to_string());
 
         // Duration metrics
         if let Some(duration) = total_duration_seconds {
@@ -431,4 +370,4 @@ impl AnalyticsClient {
 // Helper function to create analytics client from config
 pub async fn create_analytics_client(config: AnalyticsConfig) -> AnalyticsClient {
     AnalyticsClient::new(config).await
-} 
+}

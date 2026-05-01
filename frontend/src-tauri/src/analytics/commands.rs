@@ -204,83 +204,10 @@ pub async fn track_user_first_launch() -> Result<(), String> {
     }
 }
 
-// Summary generation analytics commands
-#[command]
-pub async fn track_summary_generation_started(model_provider: String, model_name: String, transcript_length: usize) -> Result<(), String> {
-    let client = {
-        let guard = ANALYTICS_CLIENT.lock().unwrap();
-        guard.as_ref().cloned()
-    };
-    
-    if let Some(client) = client {
-        client.track_summary_generation_started(&model_provider, &model_name, transcript_length).await
-    } else {
-        Err("Analytics client not initialized".to_string())
-    }
-}
-
-#[command]
-pub async fn track_summary_generation_completed(model_provider: String, model_name: String, success: bool, duration_seconds: Option<u64>, error_message: Option<String>) -> Result<(), String> {
-    let client = {
-        let guard = ANALYTICS_CLIENT.lock().unwrap();
-        guard.as_ref().cloned()
-    };
-    
-    if let Some(client) = client {
-        client.track_summary_generation_completed(&model_provider, &model_name, success, duration_seconds, error_message.as_deref()).await
-    } else {
-        Err("Analytics client not initialized".to_string())
-    }
-}
-
-#[command]
-pub async fn track_summary_regenerated(model_provider: String, model_name: String) -> Result<(), String> {
-    let client = {
-        let guard = ANALYTICS_CLIENT.lock().unwrap();
-        guard.as_ref().cloned()
-    };
-    
-    if let Some(client) = client {
-        client.track_summary_regenerated(&model_provider, &model_name).await
-    } else {
-        Err("Analytics client not initialized".to_string())
-    }
-}
-
-#[command]
-pub async fn track_model_changed(old_provider: String, old_model: String, new_provider: String, new_model: String) -> Result<(), String> {
-    let client = {
-        let guard = ANALYTICS_CLIENT.lock().unwrap();
-        guard.as_ref().cloned()
-    };
-    
-    if let Some(client) = client {
-        client.track_model_changed(&old_provider, &old_model, &new_provider, &new_model).await
-    } else {
-        Err("Analytics client not initialized".to_string())
-    }
-}
-
-#[command]
-pub async fn track_custom_prompt_used(prompt_length: usize) -> Result<(), String> {
-    let client = {
-        let guard = ANALYTICS_CLIENT.lock().unwrap();
-        guard.as_ref().cloned()
-    };
-
-    if let Some(client) = client {
-        client.track_custom_prompt_used(prompt_length).await
-    } else {
-        Err("Analytics client not initialized".to_string())
-    }
-}
-
 #[command]
 pub async fn track_meeting_ended(
     transcription_provider: String,
     transcription_model: String,
-    summary_provider: String,
-    summary_model: String,
     total_duration_seconds: Option<f64>,
     active_duration_seconds: f64,
     pause_duration_seconds: f64,
@@ -299,8 +226,6 @@ pub async fn track_meeting_ended(
         client.track_meeting_ended(
             &transcription_provider,
             &transcription_model,
-            &summary_provider,
-            &summary_model,
             total_duration_seconds,
             active_duration_seconds,
             pause_duration_seconds,

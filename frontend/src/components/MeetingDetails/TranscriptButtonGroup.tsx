@@ -38,7 +38,7 @@ export function TranscriptButtonGroup({
   }, [onRefetchTranscripts]);
 
   return (
-    <div className="flex items-center justify-center w-full gap-2">
+    <div className="flex items-center justify-start sm:justify-end w-full sm:w-auto gap-2">
       <ButtonGroup>
         <Button
           variant="outline"
@@ -51,7 +51,7 @@ export function TranscriptButtonGroup({
           title={transcriptCount === 0 ? 'No transcript available' : 'Copy Transcript'}
         >
           <Copy />
-          <span className="hidden lg:inline">Copy</span>
+          <span className="hidden lg:inline">Copy transcript</span>
         </Button>
 
         <Button
@@ -65,7 +65,7 @@ export function TranscriptButtonGroup({
           title="Open Recording Folder"
         >
           <FolderOpen className="xl:mr-2" size={18} />
-          <span className="hidden lg:inline">Recording</span>
+          <span className="hidden lg:inline">Open folder</span>
         </Button>
 
         {betaFeatures.importAndRetranscribe && meetingId && meetingFolderPath && (

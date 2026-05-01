@@ -271,7 +271,7 @@ export function TranscriptProvider({ children }: { children: ReactNode }) {
           });
         });
 
-        // Log the processing summary
+        // Log the processing details
         const logMessage = forceFlush
           ? `Force flush processed ${allNewTranscripts.length} transcripts (${sortedTranscripts.length} sequential, ${forceFlushTranscripts.length} forced)`
           : `Processed ${allNewTranscripts.length} transcripts (${sortedTranscripts.length} sequential, ${recentTranscripts.length} recent, ${staleTranscripts.length} stale)`;
