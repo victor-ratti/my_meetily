@@ -106,6 +106,73 @@ function Test-MsvcBuildTools {
     return [bool]$Arm64InstallPath
 }
 
+function Get-VsDevCmdPath {
+    $ProgramFilesX86 = ${env:ProgramFiles(x86)}
+    if (-not $ProgramFilesX86) {
+        return $null
+    }
+
+    $VsWhere = Join-Path $ProgramFilesX86 "Microsoft Visual Studio\Installer\vswhere.exe"
+    if (-not (Test-Path $VsWhere)) {
+        return $null
+    }
+
+    $InstallPath = & $VsWhere `
+        -latest `
+        -products * `
+        -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+        -property installationPath
+
+    if (-not $InstallPath) {
+        $InstallPath = & $VsWhere `
+            -latest `
+            -products * `
+            -requires Microsoft.VisualStudio.Component.VC.Tools.ARM64 `
+            -property installationPath
+    }
+
+    if (-not $InstallPath) {
+        return $null
+    }
+
+    $VsDevCmd = Join-Path $InstallPath "Common7\Tools\VsDevCmd.bat"
+    if (Test-Path $VsDevCmd) {
+        return $VsDevCmd
+    }
+
+    return $null
+}
+
+function Import-VsDevEnvironment {
+    if ($env:VSCMD_VER) {
+        return
+    }
+
+    $VsDevCmd = Get-VsDevCmdPath
+    if (-not $VsDevCmd) {
+        throw "Visual Studio developer environment was not found. Rerun .\run-local.cmd -InstallPrereqs, then restart PowerShell."
+    }
+
+    $Arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "amd64" }
+    Write-Step "Loading Visual Studio C++ build environment ($Arch)"
+
+    $EnvironmentOutput = cmd.exe /s /c "`"$VsDevCmd`" -arch=$Arch -host_arch=$Arch >nul && set"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to load Visual Studio developer environment."
+    }
+
+    foreach ($Line in $EnvironmentOutput) {
+        $SeparatorIndex = $Line.IndexOf("=")
+        if ($SeparatorIndex -le 0) {
+            continue
+        }
+
+        $Name = $Line.Substring(0, $SeparatorIndex)
+        $Value = $Line.Substring($SeparatorIndex + 1)
+        [Environment]::SetEnvironmentVariable($Name, $Value, "Process")
+    }
+}
+
 function Ensure-MsvcBuildTools {
     if (Test-MsvcBuildTools) {
         return
@@ -154,6 +221,15 @@ if ($Mode -eq "desktop") {
         -ExtraPath (Join-Path $env:USERPROFILE ".cargo\bin")
 
     Ensure-MsvcBuildTools
+
+    Ensure-Command `
+        -CommandName "clang" `
+        -PackageId "LLVM.LLVM" `
+        -PackageName "LLVM / Clang" `
+        -ManualInstallHint "Install LLVM from https://llvm.org/ or install the Visual Studio Clang tools." `
+        -ExtraPath (Join-Path $env:ProgramFiles "LLVM\bin")
+
+    Import-VsDevEnvironment
 }
 
 Push-Location $FrontendDir
