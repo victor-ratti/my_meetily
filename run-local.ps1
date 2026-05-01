@@ -26,6 +26,21 @@ function Test-CommandAvailable {
     return [bool](Get-Command $CommandName -ErrorAction SilentlyContinue)
 }
 
+function Add-PathIfExists {
+    param([string]$PathToAdd)
+
+    if (-not $PathToAdd -or -not (Test-Path $PathToAdd)) {
+        return
+    }
+
+    $PathParts = $env:Path -split ";"
+    if ($PathParts -contains $PathToAdd) {
+        return
+    }
+
+    $env:Path = "$PathToAdd;$env:Path"
+}
+
 function Install-WithWinget {
     param(
         [string]$PackageId,
@@ -57,6 +72,8 @@ function Ensure-Command {
         [string]$ExtraPath
     )
 
+    Add-PathIfExists $ExtraPath
+
     if (Test-CommandAvailable $CommandName) {
         return
     }
@@ -67,9 +84,7 @@ function Ensure-Command {
 
     Install-WithWinget -PackageId $PackageId -PackageName $PackageName
 
-    if ($ExtraPath -and (Test-Path $ExtraPath)) {
-        $env:Path = "$ExtraPath;$env:Path"
-    }
+    Add-PathIfExists $ExtraPath
 
     if (-not (Test-CommandAvailable $CommandName)) {
         throw "$PackageName was installed, but $CommandName is still not available in this terminal. Restart your terminal, then rerun .\run-local.cmd."
