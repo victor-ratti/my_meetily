@@ -209,16 +209,23 @@ function Ensure-MsvcBuildTools {
 }
 
 function Clear-BadWhisperBindings {
-    $BindingsRoot = Join-Path $RootDir "target\debug\build"
+    $BindingsRoot = Join-Path $RootDir "target"
     if (-not (Test-Path $BindingsRoot)) {
         return
     }
 
     $BadBindings = Get-ChildItem -Path $BindingsRoot -Recurse -Filter "bindings.rs" -ErrorAction SilentlyContinue |
         Where-Object {
-            $_.FullName -like "*whisper-rs-sys*" -and
-            (Select-String -Path $_.FullName -Pattern "pub struct whisper_full_params" -Context 0,3 -ErrorAction SilentlyContinue |
-                Where-Object { $_.Context.PostContext -contains "    pub _address: u8," })
+            if ($_.FullName -notlike "*whisper-rs-sys*") {
+                $false
+            } else {
+                $HasOpaqueParams = Select-String -Path $_.FullName -Pattern "pub struct whisper_full_params" -Context 0,3 -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Context.PostContext -contains "    pub _address: u8," }
+
+                $HasBundledLinuxLayouts = Select-String -Path $_.FullName -Pattern "_G_fpos_t|_G_fpos64_t|_IO_FILE" -Quiet -ErrorAction SilentlyContinue
+
+                [bool]($HasOpaqueParams -or $HasBundledLinuxLayouts)
+            }
         } |
         Select-Object -First 1
 
@@ -256,8 +263,6 @@ Ensure-Command `
     -ExtraPath (Join-Path $env:ProgramFiles "nodejs")
 
 if ($Mode -eq "desktop") {
-    $env:WHISPER_DONT_GENERATE_BINDINGS = "1"
-
     Ensure-Command `
         -CommandName "cargo" `
         -PackageId "Rustlang.Rustup" `
