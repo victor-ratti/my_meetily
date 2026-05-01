@@ -208,6 +208,34 @@ function Ensure-MsvcBuildTools {
     }
 }
 
+function Clear-BadWhisperBindings {
+    $BindingsRoot = Join-Path $RootDir "target\debug\build"
+    if (-not (Test-Path $BindingsRoot)) {
+        return
+    }
+
+    $BadBindings = Get-ChildItem -Path $BindingsRoot -Recurse -Filter "bindings.rs" -ErrorAction SilentlyContinue |
+        Where-Object {
+            $_.FullName -like "*whisper-rs-sys*" -and
+            (Select-String -Path $_.FullName -Pattern "pub struct whisper_full_params" -Context 0,3 -ErrorAction SilentlyContinue |
+                Where-Object { $_.Context.PostContext -contains "    pub _address: u8," })
+        } |
+        Select-Object -First 1
+
+    if (-not $BadBindings) {
+        return
+    }
+
+    Write-Step "Clearing stale generated Whisper bindings"
+    Push-Location $RootDir
+    try {
+        cargo clean -p whisper-rs-sys
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 if (-not (Test-Path $FrontendDir)) {
     throw "frontend directory not found at $FrontendDir"
 }
@@ -228,6 +256,8 @@ Ensure-Command `
     -ExtraPath (Join-Path $env:ProgramFiles "nodejs")
 
 if ($Mode -eq "desktop") {
+    $env:WHISPER_DONT_GENERATE_BINDINGS = "1"
+
     Ensure-Command `
         -CommandName "cargo" `
         -PackageId "Rustlang.Rustup" `
@@ -245,6 +275,7 @@ if ($Mode -eq "desktop") {
         -ExtraPath (Join-Path $env:ProgramFiles "LLVM\bin")
 
     Import-VsDevEnvironment
+    Clear-BadWhisperBindings
 }
 
 Push-Location $FrontendDir
