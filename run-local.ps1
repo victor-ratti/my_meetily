@@ -295,7 +295,7 @@ try {
     }
 
     if ($Mode -eq "web") {
-        Write-Step "Starting Next.js dev server on http://localhost:3118"
+        Write-Step "Starting Next.js dev server on http://127.0.0.1:3118"
         npm run dev
         exit $LASTEXITCODE
     }
